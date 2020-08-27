@@ -16,23 +16,28 @@ Data=load('substrate_R.txt');
 
 
 wl = 1./Data(:,1)*1e-2;
+
 R = Data(:,2);
+R((wl<9.5e-6) | (wl>10e-6))=[];
+wl((wl<9.5e-6) | (wl>10e-6))=[];
 Rexp = R;
-ThetaMin = 9.5;
+T = R;
+T = zeros(size(R));
+ThetaMin = 9.6;
 ThetaMax = 28.5;
-DelTheta =10;
+DelTheta =1;
 Theta = (ThetaMin:DelTheta:ThetaMax)*pi/180;
 d =[0;500e-6;0];
 
 n = ones(length(d),length(wl));
 DesignLayer =2; % layer# for which to calculate n
 
-save('FixedData.mat','Theta','wl','R','d','n','DesignLayer');
+save('FixedData.mat','Theta','wl','R','T','d','n','DesignLayer');
 
 % initial value of the index
 nInit = zeros(1,length(wl)*2);
-nInit(1:length(wl)) = linspace(2.4,3.3,length(wl));% real
-nInit((length(wl)+1):end) = wl/(4*pi)*(-log(0.1)/d(DesignLayer));%imaginary
+nInit(1:length(wl)) =3.2;% linspace(2.4,3.3,length(wl));% real
+nInit((length(wl)+1):end) = 0;%wl/(4*pi)*(-log(0.1)/d(DesignLayer));%imaginary
 
 % lower bound on the index
 nlb = zeros(1,length(wl)*2);
@@ -60,12 +65,12 @@ else
     save('LargrangCoeff','alpha','beta','gamma','delta');
     
     IterationNos = 200;
-    StepSize = 1e-5;
-    deln = 1e-8+1j*0;
+    StepSize = 1e-3;
+    deln = 1e-8;
     nStart = nInit;
     for i =1:IterationNos
        
-        [loss,rp,rs,~] =MeritFunc(nStart);
+        [loss,rp,rs,tp,ts,~,~] =MeritFunc(nStart);
         f(i) = mean(loss);
         sprintf('Step %d,mean loss: %f',i,f(i))
         if ((i>1) && (f(i)>f(i-1)))
@@ -75,7 +80,7 @@ else
 %        
         end
        
-        dfdn = GradientFOM(nStart,deln,rp,rs);
+        dfdn = GradientFOM(nStart,deln,rp,rs,tp,ts);
         tempDat =zeros(1,length(wl)*2);
         tempDat(1,1:length(wl)) = real(dfdn);
         tempDat(1,(length(wl)+1):end) = imag(dfdn);
@@ -83,7 +88,7 @@ else
         
         
     end
-    [~,~,~,Rfinal] =MeritFunc(nStart);
+    [~,~,~,~,~,Rfinal,Tfinal] =MeritFunc(nStart);
     figure
     plot(wl/1e-6,nStart(1:length(wl)),'b','linewidth',MyLineWidth)
     hold on;
@@ -96,6 +101,16 @@ else
     plot(wl/1e-6,nInit(1,(length(wl)+1):end),'r','linewidth',MyLineWidth)
     xlabel('Wavelength (\mu m)')
     ylabel('Imaginary refractive index');
+    
+    
+    figure
+    plot(wl/1e-6,Rfinal*100,'b','linewidth',MyLineWidth)
+    hold on;
+    plot(wl/1e-6,R*100,'r','linewidth',MyLineWidth)
+    legend('Theory','Measured')
+    xlabel('Wavelength (\mu m)')
+    ylabel('Reflectivity (%)');
+    
     
     
     figure

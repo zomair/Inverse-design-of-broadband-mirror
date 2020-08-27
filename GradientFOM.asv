@@ -1,4 +1,4 @@
-function [delfdeln] =GradientFOM(TrialIndexColumn,deln,rpOrig,rsOrig)
+function [delfdeln] =GradientFOM(TrialIndexColumn,deln,rpOrig,rsOrig,tpOrig,tsOrig)
 
     fund_consts;
     
@@ -13,50 +13,47 @@ function [delfdeln] =GradientFOM(TrialIndexColumn,deln,rpOrig,rsOrig)
     
     rs = size(length(wl),length(Theta));
     rp = size(length(wl),length(Theta));
+    ts = size(length(wl),length(Theta));
+    tp = size(length(wl),length(Theta));
     
     
     for i =1:length(wl)
         for j=1:length(Theta)
-            [rp(i,j),rs(i,j)] = TMatrix(n(:,i),d,Theta(j),wl(i));
+            [rp(i,j),rs(i,j),tp(i,j),ts(i,j)] = TMatrix(n(:,i),d,Theta(j),wl(i));
         end
     end
     
     delrpdeln = (rp-rpOrig)/deln;
     delrsdeln = (rs-rsOrig)/deln;
+
+    deltpdeln = (tp-tpOrig)/deln;
+    deltsdeln = (ts-tsOrig)/deln;
+    
     
     delrpdelnConj = conj(rp-rpOrig)/deln;
     delrsdelnConj = conj(rs-rsOrig)/deln;
+
+    
+    deltpdelnConj = conj(tp-tpOrig)/deln;
+    deltsdelnConj = conj(ts-tsOrig)/deln;
+    
     
     AngleWeightingFunc = @(x) sin(x).*cos(x);
     AngleWeight = AngleWeightingFunc(Theta);
     
     Delrp =rpOrig.*delrpdelnConj+delrpdeln.*conj(rpOrig);
     Delrs =rsOrig.*delrsdelnConj+delrsdeln.*conj(rsOrig);
+
+    Delrp =rpOrig.*delrpdelnConj+delrpdeln.*conj(rpOrig);
+    Delrs =rsOrig.*delrsdelnConj+delrsdeln.*conj(rsOrig);
     
     DelrpPlusDelrs = Delrp+Delrs;
     
-    delRdeln = 0.5*trapz(Te)
+    delRdeln = 0.5*trapz(Theta,DelrpPlusDelrs.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
     
-%     delrpdelnAngleAveraged = trapz(Theta,delrpdeln.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
-%     delrsdelnAngleAveraged = trapz(Theta,delrsdeln.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
-% 
-%     delrpdelnAngleAveragedConj = trapz(Theta,delrpdelnConj.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
-%     delrsdelnAngleAveragedConj = trapz(Theta,delrsdelnConj.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
-%     
-%     
-%     rsOrigAngleAverage = trapz(Theta,rsOrig.*AngleWeight,2)./(trapz(Theta,AngleWeight,2)); 
-%     rpOrigAngleAverage = trapz(Theta,rpOrig.*AngleWeight,2)./(trapz(Theta,AngleWeight,2)); 
-%     
-%     delRdeln = conj(rsOrigAngleAverage).*delrsdelnAngleAveraged+rsOrigAngleAverage.*delrsdelnAngleAveragedConj+...
-%         conj(rpOrigAngleAverage).*delrpdelnAngleAveraged+rpOrigAngleAverage.*delrpdelnAngleAveragedConj;
-%     
     
     Rp = abs(rpOrig).^2;
     Rs = abs(rsOrig).^2;
-    
-    
-   
-    
     
     AngleAveragedRef =  0.5*trapz(Theta,(Rs+Rp).*AngleWeight,2)./trapz(Theta,AngleWeight,2);
     

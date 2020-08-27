@@ -11,7 +11,7 @@
 
 % calculating the first t-matrix coefficients
 
-function[rp,rs] = TMatrix(n,d,Angle,Wavelength)
+function[rp,rs,tp,ts] = TMatrix(n,d,Angle,Wavelength)
 
 sM = [1 0
     0 1];
@@ -35,5 +35,9 @@ pM = pM*pTransmissionMatrixBuilder(n(end-1),n(end),Wavelength,Angle,n(1));
 
 rs = sM(2,1)/sM(1,1);
 rp = pM(2,1)/pM(1,1);
+
+ts = 1/sM(1,1);
+tp = 1/pM(1,1);
+
 
 end
