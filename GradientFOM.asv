@@ -35,11 +35,28 @@ function [delfdeln] =GradientFOM(TrialIndexColumn,deln,rpOrig,rsOrig)
     
     DelrpPlusDelrs = Delrp+Delrs;
     
-    delRdeln = 0.5*trapz(Theta,DelrpPlusDelrs.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
+    delRdeln = 0.5*trapz(Te)
     
+%     delrpdelnAngleAveraged = trapz(Theta,delrpdeln.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
+%     delrsdelnAngleAveraged = trapz(Theta,delrsdeln.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
+% 
+%     delrpdelnAngleAveragedConj = trapz(Theta,delrpdelnConj.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
+%     delrsdelnAngleAveragedConj = trapz(Theta,delrsdelnConj.*AngleWeight,2)./(trapz(Theta,AngleWeight,2));
+%     
+%     
+%     rsOrigAngleAverage = trapz(Theta,rsOrig.*AngleWeight,2)./(trapz(Theta,AngleWeight,2)); 
+%     rpOrigAngleAverage = trapz(Theta,rpOrig.*AngleWeight,2)./(trapz(Theta,AngleWeight,2)); 
+%     
+%     delRdeln = conj(rsOrigAngleAverage).*delrsdelnAngleAveraged+rsOrigAngleAverage.*delrsdelnAngleAveragedConj+...
+%         conj(rpOrigAngleAverage).*delrpdelnAngleAveraged+rpOrigAngleAverage.*delrpdelnAngleAveragedConj;
+%     
     
     Rp = abs(rpOrig).^2;
     Rs = abs(rsOrig).^2;
+    
+    
+   
+    
     
     AngleAveragedRef =  0.5*trapz(Theta,(Rs+Rp).*AngleWeight,2)./trapz(Theta,AngleWeight,2);
     

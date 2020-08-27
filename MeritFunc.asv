@@ -29,7 +29,7 @@ function [Loss,rp,rs,AngleAveragedRef] =MeritFunc(TrialIndexColumn)
    
     
     
-    AngleAveragedRef = 0.5*trapz(Theta,(Rs+Rp).*AngleWeight,2)./trapz(Theta,AngleWeight,2);
+    AngleAveragedRef = 0.5*trapz(Theta,Rs+Rp).*AngleWeight,2)./trapz(Theta,AngleWeight,2);
     
     load('LargrangCoeff.mat','alpha','beta','gamma','delta');
     
